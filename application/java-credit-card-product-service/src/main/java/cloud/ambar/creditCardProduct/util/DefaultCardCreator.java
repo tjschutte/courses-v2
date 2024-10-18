@@ -6,6 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import static cloud.ambar.creditCardProduct.util.Constants.BASIC;
@@ -28,6 +30,11 @@ public class DefaultCardCreator implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Defining initial card products");
+        try {
+            Thread.sleep(15000);
+        } catch (Exception e) {
+
+        }
         commandService.handle(STARTER);
         commandService.handle(BASIC);
         commandService.handle(BASIC_CASH_BACK);

@@ -33,7 +33,7 @@ curl -X POST "${endpoint}/api/v1/credit_card_product/product" \
 # To list the current card products
 curl -X POST "${endpoint}/api/v1/credit_card_product/product/list-items" | jq .
 
-productId=""
+productId="9360b4e7-59f0-4ec8-b235-1781f9dc5065"
 # Activate a product
 curl -X POST "${endpoint}/api/v1/credit_card_product/product/activate/${productId}"
 
@@ -44,7 +44,7 @@ curl -X POST "${endpoint}/api/v1/credit_card_product/product/deactivate/${produc
 curl -X PATCH "${endpoint}/api/v1/credit_card_product/product" \
 -H "Content-Type: application/json" \
 -d '{
-  "id": "806ea870-56aa-4289-ac8f-76861b27a702",
+  "id": "5871c4a5-813e-4041-a1e7-faf09704b25a",
   "annualFeeInCents": 50000,
   "creditLimitInCents": 500000,
   "paymentCycle": "monthly",

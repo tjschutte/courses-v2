@@ -22,7 +22,10 @@ import cloud.ambar.creditCardProduct.exceptions.InvalidHexColorException;
 import cloud.ambar.creditCardProduct.exceptions.InvalidPaymentCycleException;
 import cloud.ambar.creditCardProduct.exceptions.InvalidRewardException;
 import cloud.ambar.creditCardProduct.exceptions.NoSuchProductException;
+import cloud.ambar.creditCardProduct.projection.CreditCardProductProjectionService;
 import cloud.ambar.creditCardProduct.projection.models.CreditCardProduct;
+import cloud.ambar.creditCardProduct.projection.models.event.AmbarEvent;
+import cloud.ambar.creditCardProduct.projection.models.event.Payload;
 import cloud.ambar.creditCardProduct.query.QueryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +53,8 @@ public class CreditCardProductCommandService {
     private static final Logger log = LogManager.getLogger(CreditCardProductCommandService.class);
 
     private final EventRepository eventStore;
+
+    private final CreditCardProductProjectionService projectionService;
 
     private final ObjectMapper objectMapper;
 
@@ -111,6 +116,10 @@ public class CreditCardProductCommandService {
         log.info("Saving Event: " + objectMapper.writeValueAsString(event));
         eventStore.save(event);
         log.info("Successfully handled " + ProductDefinedEventData.EVENT_NAME + " command.");
+
+        // Call our projection / Reaction code path (event)
+        // Some check, is this local or in the cloud
+        project(event);
     }
 
     @Transactional
@@ -149,6 +158,8 @@ public class CreditCardProductCommandService {
         log.info("Saving Event: " + objectMapper.writeValueAsString(event));
         eventStore.save(event);
         log.info("Successfully handled " + ProductDefinedEventData.EVENT_NAME + " command.");
+
+        project(event);
     }
 
     @Transactional
@@ -199,6 +210,8 @@ public class CreditCardProductCommandService {
         log.info("Saving Event: " + objectMapper.writeValueAsString(event));
         eventStore.save(event);
         log.info("Successfully handled " + ProductDeactivatedEventData.EVENT_NAME + " command.");
+
+        project(event);
     }
 
     @Transactional
@@ -253,6 +266,8 @@ public class CreditCardProductCommandService {
         eventStore.save(event);
         log.info("Successfully handled " + ProductBackgroundChangedEventData.EVENT_NAME + " command.");
 
+        project(event);
+
         return event;
     }
 
@@ -277,6 +292,8 @@ public class CreditCardProductCommandService {
         log.info("Saving Event: " + objectMapper.writeValueAsString(event));
         eventStore.save(event);
         log.info("Successfully handled " + ProductCreditLimitChangedEventData.EVENT_NAME + " command.");
+
+        project(event);
 
         return event;
     }
@@ -303,6 +320,8 @@ public class CreditCardProductCommandService {
         eventStore.save(event);
         log.info("Successfully handled " + ProductPaymentCycleChangedEventData.EVENT_NAME + " command.");
 
+        project(event);
+
         return event;
     }
 
@@ -328,6 +347,8 @@ public class CreditCardProductCommandService {
         eventStore.save(event);
         log.info("Successfully handled " + ProductDeactivatedEventData.EVENT_NAME + " command.");
 
+        project(event);
+
         return event;
     }
 
@@ -343,5 +364,18 @@ public class CreditCardProductCommandService {
         }
         log.info("Hydrated Aggregate: " + aggregate);
         return aggregate;
+    }
+
+    private void project(Event event) throws JsonProcessingException {
+        projectionService.project(Payload.builder()
+                .eventId(event.getEventId())
+                .id(event.getId())
+                .aggregateId(event.getAggregateId())
+                .causationID(event.getEventId())
+                .correlationId(event.getAggregateId())
+                .data(event.getData())
+                .version(event.getVersion())
+                .eventName(event.getEventName())
+                .build());
     }
 }

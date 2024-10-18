@@ -1,15 +1,14 @@
 package cloud.ambar.creditCardProduct.projection;
 
-import cloud.ambar.creditCardProduct.events.ProductAnnualFeeChangedEventData;
-import cloud.ambar.creditCardProduct.events.ProductBackgroundChangedEventData;
-import cloud.ambar.creditCardProduct.events.ProductCreditLimitChangedEventData;
-import cloud.ambar.creditCardProduct.exceptions.UnexpectedEventException;
-import cloud.ambar.creditCardProduct.projection.models.event.Payload;
 import cloud.ambar.creditCardProduct.database.mongo.ProjectionRepository;
 import cloud.ambar.creditCardProduct.events.ProductActivatedEventData;
+import cloud.ambar.creditCardProduct.events.ProductAnnualFeeChangedEventData;
+import cloud.ambar.creditCardProduct.events.ProductBackgroundChangedEventData;
 import cloud.ambar.creditCardProduct.events.ProductDeactivatedEventData;
 import cloud.ambar.creditCardProduct.events.ProductDefinedEventData;
+import cloud.ambar.creditCardProduct.exceptions.UnexpectedEventException;
 import cloud.ambar.creditCardProduct.projection.models.CreditCardProduct;
+import cloud.ambar.creditCardProduct.projection.models.event.Payload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +34,7 @@ public class CreditCardProductProjectionService {
     }
 
     public void project(Payload event) throws JsonProcessingException {
+        log.info("Handling payload: " + event);
         final CreditCardProduct creditCardProduct;
         switch (event.getEventName()) {
             case ProductDefinedEventData.EVENT_NAME -> {
